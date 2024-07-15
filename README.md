@@ -22,8 +22,8 @@ Author: Michael Leonhard https://tamale.net/
 
 # Atom
 
-- An atom is a sequence of one or more characters in `_abcdefghijklmnopqrstuvwxyz` followed by zero or more characters
-  from `_abcdefghijklmnopqrstuvwxyz0123456789`
+- An atom is a sequence of one or more characters in `_abcdefghijklmnopqrstuvwxyz` followed by zero or more characters from `_abcdefghijklmnopqrstuvwxyz0123456789`
+- A protocol or format specification MUST include all possible atoms present in a valid message.  This means that implementers can include static strings for matching atom values.  Processing an atom must not require allocating memory.
 - Examples:
     - `_`
     - `abc`
@@ -41,9 +41,7 @@ Author: Michael Leonhard https://tamale.net/
     - `"She typed \22ok\22."`
     - `"C:\5cWindows`
 - Parsers MUST accept these codepoints escaped in lower-case hex format:
-    - Control codes: `\00`, `\01`, `\02`, `\03`, `\04`, `\05`, `\06`, `\07`, `\08`, `\09` tab, `\0a` line
-      feed, `\0b`, `\0c`, `\0d` carriage
-      return, `\0e`, `\0f`, `\10`, `\11`, `\12`, `\13`, `\14`, `\15`, `\16`, `\17`, `\18`, `\19`, `\1a`, `\1b`, `\1c`, `\1d`, `\1e`, `\1f`, `\7f`
+    - Control codes: `\00`, `\01`, `\02`, `\03`, `\04`, `\05`, `\06`, `\07`, `\08`, `\09` tab, `\0a` line feed, `\0b`, `\0c`, `\0d` carriage return, `\0e`, `\0f`, `\10`, `\11`, `\12`, `\13`, `\14`, `\15`, `\16`, `\17`, `\18`, `\19`, `\1a`, `\1b`, `\1c`, `\1d`, `\1e`, `\1f`, `\7f`
     - Double-quote: `\22`
     - Backslash: `\5c`
 - Parsers MUST reject strings with other escaped codepoints.
@@ -51,11 +49,11 @@ Author: Michael Leonhard https://tamale.net/
 # Byte String
 
 - A byte string is a sequence of zero or more bytes, prefixed with `B`.
+- Each byte is encoded in lower-case hexadecimal format.
 - Examples:
     - `B` (`""`)
     - `B61` (`"a"`)
     - `B4f4b` (`"OK"`)
-- Each byte is encoded in lower-case hexadecimal format.
 - The parser rejects byte strings with whitespace: `B 4f`, `B4f 4b`.
 
 # Boolean
@@ -147,22 +145,25 @@ Note that JTOO allows only one format for each kind of value.
 
 - `(`, then a sequence of zero or more values of any type, separated by `,`, then `)`.
 - The parser MUST reject sets with duplicate entries.
+- Parsers should not preserve the order of entries.  If you need order, then use a list, not a set.
 - Examples:
     - `()`
     - `(1,2,3)`
     - `(t,f)`
-  - `([1,2],[3,4])`
+    - `([1,2],[3,4])`
 
 # Map
+
 - `{`, then a sequence of zero or more key=value elements of any type, separated by `,`, then `}`.
 - The parser MUST reject maps with duplicate keys.
+- Parsers should not preserve the order of entries.  If you need order, then use a list, not a map.
 - Examples:
     - `{}`
     - `{a=1,b=2}`
     - `{"a"=1,"b"=2}`
     - `{t="a"}`
     - `{T01:02=t}`
-    - `{a=[1,2,3],b=(x,y,z)`
+    - `{a=[1,2,3],b=(x,y,z)}`
 
 # HTOO
 
@@ -174,12 +175,12 @@ MIME Type: `application/htoo`
 An HTOO parser MUST behave like a JTOO parser and also MUST:
 
 - Allow end-of-line comments: `1 // This is a comment.`
-- Allow interior comments: `["a" /* This is a comment. */,"b"]`
+- Allow interior non-nesting comments: `["a" /* This is a comment. */,"b"]`.
 - Allow trailing commas
     - `[1,]`
     - `(1,)`
     - `{a=1,}`
-- Allow whitespace
+- Allow whitespace between elements
     - `[1 ]`
     - `[1, 2]`
     - `{a=1, b=2}`
