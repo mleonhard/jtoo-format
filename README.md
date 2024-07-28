@@ -69,7 +69,7 @@ Author: Michael Leonhard https://tamale.net/
   - `1_000.0`
   - `0.000_1`
 - Groups of three digits must be separated from the rest of the number with `_`, starting from the decimal point.
-- Parsers MUST reject decimal numbers with unnecessary leading or trailing zeros: `00.0`, `0.00`, etc.
+- Parsers MUST reject decimal numbers with unnecessary leading zeros: `00.0`, `01.0`, etc.
 
 # Time
 
