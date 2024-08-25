@@ -75,12 +75,14 @@ Author: Michael Leonhard https://tamale.net/
 
 Use ISO-8601 to interpret dates and times.
 Note that JTOO allows only one format for each kind of value.
+JTOO can represent dates 0001-01-01 through 9999-12-31.
 
 Date values:
 - year: `D2023`
 - month: `D2023-01`
-- week: `D2023-W01`
 - date: `D2023-01-01`
+- week: `D2023-W01`
+- week_date: `D2023-W01-01`
 
 Time values:
 - hour: `T01` (00-23)
@@ -90,13 +92,13 @@ Time values:
 - microsecond: `T01:02:03.004_005` (000_000-999_999)
 - nanosecond: `T01:02:03.004_005_006` (000_000_000-999_999_999)
 
-Timezone values:
+Timezone offset values:
 - `Z` (UTC)
 - Hour offset: `-08` (Pacific Standard Time)
 - Hour and minute offset: `+0530` (Indian Standard Time)
-- Parsers MUST reject timezone values with `00` minute part. Example: `+0800`
+- Parsers MUST reject timezone offset values with `00` minute part. Example: `+0800`
 
-Combinations of date + timezone, time + timezone, and date + time + timezone.  Examples:
+Combinations of date + timezone offset, week_date + timezone offset, time + timezone offset, date + time + timezone offset, and week_date + time + timezone offset.  Examples:
 - year-timezone: `D2023Z`
 - date-hour: concatenate a date and hour, `D2023-12-30T01`
 - date-minute: concatenate a date and minute: `D2023-12-30T01:02`
