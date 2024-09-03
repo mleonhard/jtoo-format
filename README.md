@@ -155,6 +155,43 @@ An HTOO parser MUST behave like a JTOO parser and also MUST:
 - Allow numbers with `_` separators between any two digits.
 - Allow timezones with `00` minute part: `-0800`, `+0500`.
 
+# JTOO Frame Format
+
+When programs communicate, they usually do so by sending discrete messages.
+When communicating through a byte stream connection, like TCP, they need a way to show show which bytes belong to each message.
+This is called message framing.
+
+Message framing schemes affect the complexity of the programs.
+Some common framing schemes, starting with simple and increasing complexity:
+
+- Length prefix - Framing code is completely de-coupled from message processing code.
+- Newline-delimited - Framing code must encode and decode newlines inside messages.
+- JSON objects - Framing code is coupled with JSON parser.
+
+The JTOO frame format uses length prefixes.
+
+A JTOO consists of these parts: the length of the JTOO section, a space, the length of the binary section, a space, the JTOO section, a space, the binary section, and a newline.
+Each length is exactly 6 lower-case hexadecimal characters encoding big-endian unsigned integers.
+Each length may be up to one byte less than 16 MiB.
+
+Examples:
+
+- A frame with zero-length JTOO and binary sections: `000000 000000 \n`
+- A frame with a short JTOO section: `00000E 000000 [["code":200]] \n`
+- A frame with a short binary section: `000000 000011  A binary message\0\n`
+- A frame with both sections: `000016 000009 [["status":"success"]] LzsGqqfC9\n`
+
+# JTOO Protocols
+
+When programs communicate using a protocol based on the JTOO frame format, the initiating program sends a greeting message which is a JTOO frame.
+- The greeting frame must be 16 KiB or shorter.
+- The greeting frame JTOO section is a list of key-value pairs.
+- There must be a single "protocol" key. Programs MUST immediately terminate the connection if the greeting contains duplicate keys, to prevent request smuggling and cross-protocol attacks.
+
+Example greeting: `000043 000000 [["protocol":"e7/LyniPSK","id":Bc8fd0fb7,"nonce":B8da5ab6f3fdb1bb0]] \n`
+
+If a program receives a connection and a greeting, but it does not support the specified `protocol` version, it must respond with: `00002d 000000 [["code":505,"error":"unsupported protocol"]] \n`
+
 # Acknowledgements
 
 - Thanks to Emma Wang for suggesting the name, "J-two".
