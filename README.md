@@ -32,7 +32,7 @@ Author: Michael Leonhard https://tamale.net/
     - Control codes: `\00`, `\01`, `\02`, `\03`, `\04`, `\05`, `\06`, `\07`, `\08`, `\09` tab, `\0a` line feed, `\0b`, `\0c`, `\0d` carriage return, `\0e`, `\0f`, `\10`, `\11`, `\12`, `\13`, `\14`, `\15`, `\16`, `\17`, `\18`, `\19`, `\1a`, `\1b`, `\1c`, `\1d`, `\1e`, `\1f`, `\7f`
     - Double-quote: `\22`
     - Backslash: `\5c`
-- Parsers MUST reject strings with these codepoints un-escaped or with other escaped codepoints.  This helps prevent request smuggling attacks.
+- Parsers MUST reject strings with these codepoints un-escaped or with other escaped codepoints. This helps prevent request smuggling attacks.
 
 # Byte String
 
@@ -66,8 +66,8 @@ Author: Michael Leonhard https://tamale.net/
     - `0.0`
     - `1.0`
     - `-1.0`
-  - `1_000.0`
-  - `0.000_1`
+    - `1_000.0`
+    - `0.000_1`
 - Groups of three digits must be separated from the rest of the number with `_`, starting from the decimal point.
 - Parsers MUST reject decimal numbers with unnecessary leading zeros: `00.0`, `01.0`, etc.
 
@@ -78,6 +78,7 @@ Note that JTOO allows only one format for each kind of value.
 JTOO can represent dates 0001-01-01 through 9999-12-31.
 
 Date values:
+
 - year: `D2023`
 - month: `D2023-01`
 - date: `D2023-01-01`
@@ -85,6 +86,7 @@ Date values:
 - week_date: `D2023-W01-01`
 
 Time values:
+
 - hour: `T01` (00-23)
 - minute: `T23:01` (00-59)
 - second: `T01:02:03` (0-60)
@@ -93,18 +95,21 @@ Time values:
 - nanosecond: `T01:02:03.004_005_006` (000_000_000-999_999_999)
 
 Timezone offset values:
+
 - `Z` (UTC)
 - Hour offset: `-08` (Pacific Standard Time)
 - Hour and minute offset: `+0530` (Indian Standard Time)
 - Parsers MUST reject timezone offset values with `00` minute part. Example: `+0800`
 
-Combinations of date + timezone offset, week_date + timezone offset, time + timezone offset, date + time + timezone offset, and week_date + time + timezone offset.  Examples:
+Combinations of date + timezone offset, week_date + timezone offset, time + timezone offset, date + time + timezone offset, and week_date + time + timezone offset. Examples:
+
 - year-timezone: `D2023Z`
 - date-hour: concatenate a date and hour, `D2023-12-30T01`
 - date-minute: concatenate a date and minute: `D2023-12-30T01:02`
 - date-second-timezone: concatenate a date and second: `D2023-12-30T01:02:03-08`
 
 Timestamp values:
+
 - timestamp-second: seconds since the epoch, `S0` (the unix epoch, 1980-01-01:00:00:00Z), `S1_709_528_240`
 - timestamp-millisecond`S1_709_528_240.001`
 - timestamp-microsecond: `S1_709_528_240.000_001`
