@@ -97,16 +97,20 @@ Time values:
 Timezone offset values:
 
 - `Z` (UTC)
-- Hour offset: `-08` (Pacific Standard Time)
+- Negative hour offset: `~08` (Pacific Standard Time).  Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-timezone vs year-month values and year-month-timezone vs year-month-day values.
+- Positive hour offset: `+01` (Central European Time)
 - Hour and minute offset: `+0530` (Indian Standard Time)
 - Parsers MUST reject timezone offset values with `00` minute part. Example: `+0800`
 
 Combinations of date + timezone offset, week_date + timezone offset, time + timezone offset, date + time + timezone offset, and week_date + time + timezone offset. Examples:
 
 - year-timezone: `D2023Z`
+- year-month-day:      `D2023-12-08`
+- year-month-timezone: `D2023-12~08`
+- year-month-timezone: `D2023-12+08`
 - date-hour: concatenate a date and hour, `D2023-12-30T01`
 - date-minute: concatenate a date and minute: `D2023-12-30T01:02`
-- date-second-timezone: concatenate a date and second: `D2023-12-30T01:02:03-08`
+- date-second-timezone: concatenate a date and second: `D2023-12-30T01:02:03~08`
 
 Timestamp values:
 
@@ -114,6 +118,8 @@ Timestamp values:
 - timestamp-millisecond`S1_709_528_240.001`
 - timestamp-microsecond: `S1_709_528_240.000_001`
 - timestamp-nanosecond: `S1_709_528_240.000_000_001`
+
+TODO: Add support for time durations.
 
 # List
 
