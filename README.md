@@ -79,26 +79,26 @@ JTOO can represent dates 0001-01-01 through 9999-12-31.
 
 Date values:
 
-- year: `D2023`
-- month: `D2023-01`
-- date: `D2023-01-01`
-- week: `D2023-W01`
-- week_date: `D2023-W01-01`
+- year: `D2023` (0001-9999)
+- month: `D2023-01` (01-12)
+- day: `D2023-01-01` (01-31)
+- week: `D2023-W01` (01-53)
+- week_day: `D2023-W01-1` (1-7)
 
 Time values:
 
-- hour: `T01` (00-23)
-- minute: `T23:01` (00-59)
-- second: `T01:02:03` (0-60)
-- millisecond: `T01:02:03.004` (000-999)
-- microsecond: `T01:02:03.004_005` (000_000-999_999)
-- nanosecond: `T01:02:03.004_005_006` (000_000_000-999_999_999)
+- hour: `T10` (00-23)
+- minute: `T10:20` (00-59)
+- second: `T10:20:30` (0-60)
+- millisecond: `T10:20:30.400` (000-999)
+- microsecond: `T10:20:30.400_500` (000_000-999_999)
+- nanosecond: `T10:20:30.400_500_600` (000_000_000-999_999_999)
 
 Timezone offset values:
 
 - `Z` (UTC)
-- Negative hour offset: `~08` (Pacific Standard Time).  Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-timezone vs year-month values and year-month-timezone vs year-month-day values.
 - Positive hour offset: `+01` (Central European Time)
+- Negative hour offset: `~08` (Pacific Standard Time).  Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-timezone vs year-month values and year-month-timezone vs year-month-day values.
 - Hour and minute offset: `+0530` (Indian Standard Time)
 - Parsers MUST reject timezone offset values with `00` minute part. Example: `+0800`
 
