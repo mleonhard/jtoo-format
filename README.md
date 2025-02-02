@@ -18,7 +18,7 @@ Author: Michael Leonhard https://tamale.net/
 # Document
 
 - A JTOO document is a single instance of a JTOO data type, encoded in UTF-8.
-- Example: `["msg":"你好"]` encodes as bytes `5b 22 6d 73 67 22 3a 22 e4 bd a0 e5 a5 bd 22 5d`
+- Example: `["msg","你好"]` encodes as bytes `5b 22 6d 73 67 22 3a 22 e4 bd a0 e5 a5 bd 22 5d`
 
 # String
 
@@ -181,16 +181,17 @@ Some common framing schemes, starting with simple and increasing complexity:
 
 The JTOO frame format uses length prefixes.
 
-A JTOO consists of these parts: the length of the JTOO section, a space, the length of the binary section, a space, the JTOO section, a space, the binary section, and a newline.
+A JTOO consists of these parts: the length of the JTOO document, a space, the length of the binary section, a space, the JTOO document, a space, the binary section, and a newline.
 Each length is exactly 6 lower-case hexadecimal characters encoding big-endian unsigned integers.
 Each length may be up to one byte less than 16 MiB.
 
 Examples:
 
-- A frame with zero-length JTOO and binary sections: `000000 000000 \n`
-- A frame with a short JTOO section: `00000E 000000 [["code":200]] \n`
+- A frame with zero-length JTOO document and binary section: `000000 000000 \n`
+- A frame with a short JTOO document: `00000E 000000 [["code",200]] \n`
 - A frame with a short binary section: `000000 000011  A binary message\0\n`
-- A frame with both sections: `000016 000009 [["status":"success"]] LzsGqqfC9\n`
+- A frame with both document and binary: `000016 000009 [["status","success"]] LzsGqqfC9\n`
+- A frame with content-type, hash, and JTOO payload: `000042 000050 [["content_type","application/jtoo"],["city64",B88768a19ec2fd01c]] [["from","a@example.com"],["text","Hello"],["received",D2025-02-01T15:38:00-08]]\n`
 
 # JTOO Protocols
 
