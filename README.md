@@ -71,56 +71,45 @@ Author: Michael Leonhard https://tamale.net/
 - Groups of three digits must be separated from the rest of the number with `_`, starting from the decimal point.
 - Parsers MUST reject decimal numbers with unnecessary leading zeros: `00.0`, `01.0`, etc.
 
-# Time
+# DateTime
 
 Use ISO-8601 to interpret dates and times.
 Note that JTOO allows only one format for each kind of value.
 JTOO can represent dates 0001-01-01 through 9999-12-31.
 
-Date values:
+A JTOO datetime has the format `D` year `-` month `-` day `T` hour `-` minute `-` second offset.
 
-- year: `D2023` (0001-9999)
-- month: `D2023-01` (01-12)
-- day: `D2023-01-01` (01-31)
-- week: `D2023-W01` (01-53)
-- week_day: `D2023-W01-1` (1-7)
+- year: `0001` - `9999`
+- month: `01` - `12`
+- day: `01` - `31`
+- hour: `00` - `23`
+- minute: `00` - `59`
+- second:
+    - `00` - `60`
+    - `00.000` - `60.999`
+    - `00.000` _ `000-60.999_999`
+    - `00.000` _ `000_000-60.999_999_999`
+- offset
+    - `Z` (UTC)
+    - `+01` through `+23`
+    - `+0001` through `+2359`
+    - `-01` through `-23`
+    - `-0001` through `-2359`
+    - Parsers MUST reject offset values with a `00` minute part. Example: `+0800`.
 
-Time values:
+Examples:
 
-- hour: `T10` (00-23)
-- minute: `T10:20` (00-59)
-- second: `T10:20:30` (0-60)
-- millisecond: `T10:20:30.400` (000-999)
-- microsecond: `T10:20:30.400_500` (000_000-999_999)
-- nanosecond: `T10:20:30.400_500_600` (000_000_000-999_999_999)
+- `D2023-01-01T10:20:30Z`
+- `D2023-01-01T10:20:30.400+1`
+- `D2023-01-01T10:20:30.400_500-08`
+- `D2023-01-01T10:20:30.400_500_600+0530`
 
-Offset values:
-
-- No offset: `Z` (UTC)
-- Positive hour offset: `+01` (Central European Time)
-- Negative hour offset: `~08` (Pacific Standard Time).
-  - Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-offset vs year-month values and year-month-offset vs year-month-day values.
-- Hour and minute offset: `+0530` (Indian Standard Time)
-- Parsers MUST reject offset values with `00` minute part. Example: `+0800`
-
-Combinations of date + offset, week_date + offset, time + offset, date + time + offset, and week_date + time + offset. Examples:
-
-- year-offset: `D2023Z`
-- year-month-day: `D2023-12-08`
-- year-month-offset: `D2023-12~08`
-- year-month-offset: `D2023-12+08`
-- date-hour: concatenate a date and hour, `D2023-12-30T01`
-- date-minute: concatenate a date and minute: `D2023-12-30T01:02`
-- date-second-offset: concatenate a date and second: `D2023-12-30T01:02:03~08`
-
-Timestamp values:
+# Timestamp
 
 - timestamp-second: seconds since the epoch, `S0` (the unix epoch, 1980-01-01:00:00:00Z), `S1_709_528_240`
 - timestamp-millisecond`S1_709_528_240.001`
 - timestamp-microsecond: `S1_709_528_240.000_001`
 - timestamp-nanosecond: `S1_709_528_240.000_000_001`
-
-TODO: Add support for time durations.
 
 # List
 
@@ -161,11 +150,26 @@ An HTOO parser MUST behave like a JTOO parser and also MUST:
 - Allow numbers without `_` separators.
 - Allow numbers with `_` separators between any two digits.
 - Allow offsets with `00` minute part: `-0800`, `+0500`.
+- Allow zero offsets, treat them as `Z`: `-00`, `+00`, `-0000`, `+0000`
+- Allow extra zeros in offsets: `+01000`
+- Allow single-digit offset hour: `-1`, `+1`
+- Allow colons in offsets: `+5:30`
+- Allow truncated dates and times and missing offset. For missing parts, use values from `D1970-01-01T00:00:00Z`.
+    - `D2025` (year)
+    - `D2025-1` (month)
+    - `D2025T-1` (year with offset)
+    - `D2025-1-1` (date)
+    - `D2025-1T-1` (month with offset)
+    - `D2025-1-1-1` (date with offset)
+    - `D2025-1-1T-1` (date with offset)
+    - `D2025-1-1T0-1` (hour with offset)
+    - `D-1` (only offset)
+    - `DT-1` (only offset)
 
 # JTOO Frame Format
 
 When programs communicate, they usually do so by sending discrete messages.
-When communicating through a byte stream connection, like TCP, they need a way to show show which bytes belong to each message.
+When communicating through a byte stream connection, like TCP, they need a way to show which bytes belong to each message.
 This is called message framing.
 
 Message framing schemes affect the complexity of the programs.
@@ -191,13 +195,17 @@ Examples:
 # JTOO Protocols
 
 When programs communicate using a protocol based on the JTOO frame format, the initiating program sends a greeting message which is a JTOO frame.
+
 - The greeting frame must be 16 KiB or shorter.
 - The greeting frame JTOO section is a list of key-value pairs.
-- There must be a single "protocol" key. Programs MUST immediately terminate the connection if the greeting contains duplicate keys, to prevent request smuggling and cross-protocol attacks.
+- To prevent request smuggling and cross-protocol attackes, programs MUST immediately terminate the connection if the greeting contains:
+    - duplicate keys
+    - keys with characters not in `a-z`, `0-9`, `_`
 
-Example greeting: `000043 000000 [["protocol":"e7/LyniPSK","id":Bc8fd0fb7,"nonce":B8da5ab6f3fdb1bb0]] \n`
+Example greeting: `000043 000000 [["protocol","e7/LyniPSK"],["id",Bc8fd0fb7],["nonce",B8da5ab6f3fdb1bb0]] \n`
 
-If a program receives a connection and a greeting, but it does not support the specified `protocol` version, it must respond with: `00002d 000000 [["code":505,"error":"unsupported protocol"]] \n`
+If a program receives a connection and a greeting, but it does not support the specified `protocol` version, it must
+respond with: `00002d 000000 [["code",505],["error","unsupported protocol"]] \n`
 
 # Acknowledgements
 
