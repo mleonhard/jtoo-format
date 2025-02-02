@@ -94,23 +94,24 @@ Time values:
 - microsecond: `T10:20:30.400_500` (000_000-999_999)
 - nanosecond: `T10:20:30.400_500_600` (000_000_000-999_999_999)
 
-Timezone offset values:
+Offset values:
 
-- `Z` (UTC)
+- No offset: `Z` (UTC)
 - Positive hour offset: `+01` (Central European Time)
-- Negative hour offset: `~08` (Pacific Standard Time).  Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-timezone vs year-month values and year-month-timezone vs year-month-day values.
+- Negative hour offset: `~08` (Pacific Standard Time).
+  - Note: This uses the tilde instead of the minus symbol, so parsers can distinguish year-offset vs year-month values and year-month-offset vs year-month-day values.
 - Hour and minute offset: `+0530` (Indian Standard Time)
-- Parsers MUST reject timezone offset values with `00` minute part. Example: `+0800`
+- Parsers MUST reject offset values with `00` minute part. Example: `+0800`
 
-Combinations of date + timezone offset, week_date + timezone offset, time + timezone offset, date + time + timezone offset, and week_date + time + timezone offset. Examples:
+Combinations of date + offset, week_date + offset, time + offset, date + time + offset, and week_date + time + offset. Examples:
 
-- year-timezone: `D2023Z`
-- year-month-day:      `D2023-12-08`
-- year-month-timezone: `D2023-12~08`
-- year-month-timezone: `D2023-12+08`
+- year-offset: `D2023Z`
+- year-month-day: `D2023-12-08`
+- year-month-offset: `D2023-12~08`
+- year-month-offset: `D2023-12+08`
 - date-hour: concatenate a date and hour, `D2023-12-30T01`
 - date-minute: concatenate a date and minute: `D2023-12-30T01:02`
-- date-second-timezone: concatenate a date and second: `D2023-12-30T01:02:03~08`
+- date-second-offset: concatenate a date and second: `D2023-12-30T01:02:03~08`
 
 Timestamp values:
 
@@ -159,7 +160,7 @@ An HTOO parser MUST behave like a JTOO parser and also MUST:
 - Allow decimal numbers with unnecessary trailing zeros: `0.00`
 - Allow numbers without `_` separators.
 - Allow numbers with `_` separators between any two digits.
-- Allow timezones with `00` minute part: `-0800`, `+0500`.
+- Allow offsets with `00` minute part: `-0800`, `+0500`.
 
 # JTOO Frame Format
 
